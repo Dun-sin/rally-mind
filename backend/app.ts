@@ -7,20 +7,20 @@ const mongoose = require('mongoose');
 // all routes
 
 // utils
-const {info, error} = require('./src/utils/logger');
-const {MONGODB_URI} = require('./src/utils/config')
+const logs= require('./src/utils/logger');
+const configs = require('./src/utils/config')
 const middleware = require('./src/utils/middleware');
 
 mongoose.set('strictQuery', false);
-info('connecting to', MONGODB_URI);
+logs.info('connecting to', configs.MONGODB_URI);
 
 mongoose
 	.connect(MONGODB_URI)
 	.then(() => {
-		info('connected');
+		logs.info('connected');
 	})
 	.catch((err) => {
-		error('error occurred while connecting: ', err);
+		logs.error('error occurred while connecting: ', err);
 	});
 
 // middleware
