@@ -1,3 +1,5 @@
+import logger from './logger';
+
 type OpenGraphType = {
   siteName: string;
   description: string;

@@ -1,27 +1,56 @@
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 import logger from '@/lib/logger';
 import Seo from '@/components/Seo';
-import { useRouter } from 'next/router';
-import { loginDetailsType } from '@/types/User';
+import { signupDetailsType } from '@/types/User';
 import { getFromLocalStorage } from '@/lib/helper';
+import { useRouter } from 'next/router';
 
-const Login = () => {
+const Register = () => {
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
 
-  const handleLogin = async (loginDetails: loginDetailsType) => {
+  useEffect(() => {
+    const token = getFromLocalStorage('token');
+
+    if (token) {
+      const checkToken = async () => {
+        try {
+          const response = await fetch(
+            'http://localhost:4000/api/users/protected',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          window.localStorage.setItem('email', data.message);
+          response.ok ? router.push('/home') : logger(data.message);
+        } catch (error) {
+          logger(error, 'Error');
+        }
+      };
+
+      checkToken();
+    }
+  });
+
+  const handleSignup = async (signupDetails: signupDetailsType) => {
     try {
-      const response = await fetch('http://localhost:4000/api/users/login', {
+      const response = await fetch('http://localhost:4000/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...loginDetails }),
+        body: JSON.stringify({ ...signupDetails }),
       });
 
       const data = await response.json();
@@ -29,13 +58,10 @@ const Login = () => {
         const { token } = data;
         // Store the token in web storage
         localStorage.setItem('token', token);
-
-        window.localStorage.setItem('email', loginDetails.email);
-
-        router.push('/home');
+        console.log('Signup successful');
       } else {
-        const error = `Login failed: ${data.message}`;
-        logger(error);
+        const error = `SignUp failed: ${data.message}`;
+        console.error(error);
         setError(error);
       }
     } catch (error) {
@@ -44,21 +70,33 @@ const Login = () => {
   };
 
   const handleSubmit = () => {
-    if (emailRef.current === null || passwordRef.current === null) return;
+    if (
+      emailRef.current === null ||
+      passwordRef.current === null ||
+      usernameRef.current === null
+    )
+      return;
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
+    const username = usernameRef.current.value;
     console.log(email, password);
 
-    handleLogin({ email, password });
+    handleSignup({ email, password, username });
     resetInputValues();
   };
 
   const resetInputValues = () => {
-    if (emailRef.current === null || passwordRef.current === null) return;
+    if (
+      emailRef.current === null ||
+      passwordRef.current === null ||
+      usernameRef.current === null
+    )
+      return;
 
     emailRef.current.value = '';
     passwordRef.current.value = '';
+    usernameRef.current.value = '';
   };
 
   return (
@@ -67,8 +105,16 @@ const Login = () => {
       <Seo />
 
       <main className='bg-primary flex h-screen w-screen flex-col items-center justify-center gap-6'>
-        <h1 className='text-brand text-3xl font-semibold'>Login</h1>
+        <h1 className='text-brand text-3xl font-semibold'>Signup</h1>
         <section className='item flex w-full flex-col items-center justify-center gap-6'>
+          <input
+            type='text'
+            name='username'
+            id='username'
+            placeholder='Username'
+            ref={usernameRef}
+            className='ring-brand focus:ring-brand h-14 w-2/3 rounded-lg border-0 ring ring-inset focus:ring focus:ring-inset'
+          />
           <input
             type='email'
             placeholder='Email'
@@ -93,9 +139,9 @@ const Login = () => {
             Sumbit
           </button>
           <div className='flex gap-3'>
-            <span>Don't have an account yet?</span>
-            <Link href='/register' className='text-brand font-bold'>
-              SignUp
+            <span>Already have an account?</span>
+            <Link href='/' className='text-brand font-bold'>
+              Login
             </Link>
           </div>
         </span>
@@ -104,4 +150,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
