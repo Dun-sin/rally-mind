@@ -8,6 +8,7 @@ import Protected from '@/components/Protected';
 import { Icon } from '@iconify/react';
 import { getFromLocalStorage } from '@/lib/helper';
 import logger from '@/lib/logger';
+import Link from 'next/link';
 
 const limit = 250;
 const home = () => {
@@ -15,6 +16,20 @@ const home = () => {
   const [showReason, setShowReason] = useState(false);
   const [disableSelection, setDisableSelection] = useState(false);
   const [value, setValue] = useState(0);
+  const [songs, setSongs] = useState([
+    {
+      name: 'Happy',
+      color: '#E87C17',
+    },
+    {
+      name: 'Energized',
+      color: '#66FF00',
+    },
+    {
+      name: 'Calm',
+      color: '#F18AB5',
+    },
+  ]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -99,8 +114,8 @@ const home = () => {
   return (
     <Protected>
       <Layout>
-        <section className='bg-primary h-screen w-screen px-10 py-6'>
-          <header className='mb-20  flex items-center justify-between'>
+        <section className='h-full w-full px-10 py-6'>
+          <header className='mb-20 flex items-center justify-between'>
             <Image
               priority
               src='/svg/Logo.svg'
@@ -108,7 +123,12 @@ const home = () => {
               width={32}
               alt='Rally mind logo'
             />
-            <Icon icon='solar:settings-bold' className='text-brand h-10 w-10' />
+            <Link href='/settings'>
+              <Icon
+                icon='solar:settings-bold'
+                className='text-brand h-10 w-10'
+              />
+            </Link>
           </header>
           <main className='flex h-full flex-col gap-12'>
             <section className='flex h-2/5 flex-col gap-3'>
@@ -169,7 +189,25 @@ const home = () => {
                 <h2>Songs</h2>
                 <p>Listen to songs right for your mood</p>
               </span>
-              <div className='bg-brand max:h-full max:w-full h-full w-full rounded-md'></div>
+              <div className='bg-brand max:h-full max:w-full flex h-full w-full flex-col items-center gap-3 rounded-md py-5'>
+                {songs.map(({ name, color }) => {
+                  return (
+                    <div
+                      style={{
+                        border: `1.5px solid ${color}`,
+                        background: `linear-gradient(149deg, #F8FBFE 0%, ${color} 100%)`,
+                      }}
+                      className='flex h-14 w-[90%] items-center justify-between rounded-md px-5'
+                    >
+                      <p className='font-medium'>{`${name} Playlist`}</p>
+                      <Icon
+                        icon='icon-park-solid:play'
+                        className='text-primary h-8 w-8'
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </section>
           </main>
         </section>

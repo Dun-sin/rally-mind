@@ -1,8 +1,5 @@
-type moodsType = {
-  icon: string;
-  name: string;
-  color: string;
-};
+import { moodsType } from '@/types/Component';
+
 const moods: moodsType[] = [
   {
     icon: 'bxs:happy',
@@ -20,7 +17,7 @@ const moods: moodsType[] = [
     color: '301934',
   },
   {
-    icon: 'fluent-mdl2:sad-solid',
+    icon: 'tabler:mood-sad-filled',
     name: 'Sad',
     color: '2F3EC5',
   },
