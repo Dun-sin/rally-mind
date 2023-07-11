@@ -14,6 +14,34 @@ const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const token = getFromLocalStorage('token');
+
+    if (token) {
+      const checkToken = async () => {
+        try {
+          const response = await fetch(
+            'http://localhost:4000/api/users/protected',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          window.localStorage.setItem('email', data.message);
+          response.ok ? router.push('/home') : logger(data.message);
+        } catch (error) {
+          logger(error, 'Error');
+        }
+      };
+
+      checkToken();
+    }
+  });
+
   const handleLogin = async (loginDetails: loginDetailsType) => {
     try {
       const response = await fetch('http://localhost:4000/api/users/login', {

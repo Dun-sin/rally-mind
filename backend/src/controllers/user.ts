@@ -60,20 +60,20 @@ const loginUser = async (req: any, res: any) => {
 
 		if (!user || !passwordCorrect) {
 			return res.status(400).json({
-				error: 'Please check your email and password',
+				message: 'Please check your email and password',
 			});
 		}
 
 		// Generate JWT token
 		const token = jwt.sign({ email }, config.SECRET, { expiresIn: '31d' });
-		res.status(200).json({ token });
+		return res.status(200).json({ token });
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({ message: 'Failed to login user' });
 	}
 };
 
-const protectedRoute = (req: any, res: any) => {
+const protectedRoute = (req: any, res: any, next: any) => {
 	const authHeader = req.headers.authorization;
 
 	if (authHeader) {
@@ -81,17 +81,51 @@ const protectedRoute = (req: any, res: any) => {
 
 		jwt.verify(token, config.SECRET, (err: any, decoded: any) => {
 			if (err) {
-				res.status(401).json({ message: 'invalid token' });
+				res.status(401).json({ message: 'Invalid token' });
 			} else {
-				res.status(200).json({ message: decoded.email });
+				req.user = decoded.email; // Assign the decoded email to the request object
+				next();
 			}
 		});
 	} else {
 		res.status(401).json({ message: 'Missing authorization header' });
 	}
 };
+
+const addUserMood = async (req: any, res: any) => {
+	try {
+		const { email, moodDetails } = req.body;
+
+		if (email === undefined || email === null) {
+			return res.status(400).json({ message: 'Enter a valid email' });
+		} else if (moodDetails === undefined || moodDetails === null) {
+			return res.status(400).json({ message: `Couldn't update mood` });
+		}
+
+		console.log(moodDetails);
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				$push: {
+					moods: moodDetails,
+				},
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: `Mood added` });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Couldn't update mood` });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
 	protectedRoute,
+	addUserMood,
 };
