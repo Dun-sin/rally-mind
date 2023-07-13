@@ -1,10 +1,50 @@
-import React from 'react';
-import { Icon } from '@iconify/react';
-import { mainProps } from '@/types/Component';
+import React, { useEffect, useState } from 'react';
 
-const Main = ({ setId, setState }: mainProps) => {
-  const handleOnClickJournal = () => {
-    setId('1dskfjsfj032ir39r2329r2r23');
+import { Icon } from '@iconify/react';
+
+import logger from '@/lib/logger';
+import { formatDate, getFromLocalStorage } from '@/lib/helper';
+import { journalProps, mainProps } from '@/types/Component';
+
+const Main = ({ setJournalInfo, setState }: mainProps) => {
+  const [journals, setJournals] = useState<journalProps[]>([]);
+  const handleOnClickJournal = (info: journalProps) => {
+    setJournalInfo(info);
+    setState('Edit');
+  };
+
+  useEffect(() => {
+    const getAllJournals = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/users/journal?email=${getFromLocalStorage(
+            'email'
+          )}`,
+          {
+            headers: {
+              'Content-type': 'application/json',
+              Authorization: `Bearer ${getFromLocalStorage('token')}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          logger(data.message);
+          setJournals(data.message);
+        } else {
+          logger(`Couldn't get all journals`);
+        }
+      } catch (error) {
+        logger(error, 'Error');
+      }
+    };
+
+    getAllJournals();
+  }, []);
+
+  const resetJournalInfo = () => {
+    setJournalInfo({ _id: '', message: '', date: '' });
     setState('Edit');
   };
 
@@ -29,31 +69,31 @@ const Main = ({ setId, setState }: mainProps) => {
         </div>
       </header>
 
-      <main className='relative flex w-full flex-col px-6'>
+      <main className='relative flex w-full flex-col gap-2 px-6'>
         <span className='ml-auto font-medium underline underline-offset-1'>
           Viewing all Journals
         </span>
-        <div className='flex w-full flex-col gap-5'>
-          <div className='bg-brand h-28 max-w-full rounded-lg'>
-            <p className=''>15th March 2023</p>
-            <p className='line-clamp-1 w-full truncate'>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-              doeiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Utenim ad minim veniam, quis nostrud exercitation ullamco
-              laborisnisi ut aliquip ex ea commodo consequat. Duis aute
-              iruredolor inreprehenderit in voluptate velit esse cillum dolore
-              eufugiatnulla pariatur. Excepteur sint occaecat cupidatat
-              nonproident,sunt in culpa qui officia deserunt mollit anim id
-              estlaborum.
-            </p>
-          </div>
+        <div className='text-primary flex w-full flex-col gap-5'>
+          {journals.map(({ _id, date, message }) => {
+            return (
+              <div
+                className='bg-brand h-26 max-w-full cursor-pointer rounded-lg px-4 py-4'
+                onClick={() => handleOnClickJournal({ _id, date, message })}
+              >
+                <p className='text-2xl font-bold'>{formatDate(date)}</p>
+                <p className='line-clamp-1 w-full truncate'>
+                  {message.slice(0, 200)}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </main>
 
       <Icon
         icon='gridicons:add'
-        className='text-brand absolute bottom-2 right-4 h-14 w-14 cursor-pointer'
-        onClick={() => {}}
+        className='text-brand absolute bottom-4 right-4 h-14 w-14 cursor-pointer'
+        onClick={resetJournalInfo}
       />
     </section>
   );

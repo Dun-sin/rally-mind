@@ -97,12 +97,12 @@ const addUserMood = async (req: any, res: any) => {
 		const { email, moodDetails } = req.body;
 
 		if (email === undefined || email === null) {
-			return res.status(400).json({ message: 'Enter a valid email' });
+			return res.status(400).json({ message: 'No email was provided' });
 		} else if (moodDetails === undefined || moodDetails === null) {
-			return res.status(400).json({ message: `Couldn't update mood` });
+			return res.status(400).json({ message: `No data was provided` });
 		}
 
-		console.log(moodDetails);
+		logger.info(moodDetails);
 
 		await User.findOneAndUpdate(
 			{ email: email },
@@ -119,7 +119,54 @@ const addUserMood = async (req: any, res: any) => {
 		return res.status(200).json({ message: `Mood added` });
 	} catch (error) {
 		logger.error(error);
-		return res.status(500).json({ message: `Couldn't update mood` });
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const addUserJournal = async (req: any, res: any) => {
+	try {
+		const { email, journal } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (journal === undefined || journal === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		logger.info(journal, 'Journal');
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				$push: {
+					journal: journal,
+				},
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: 'Journal added' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+const getAllJournals = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email === undefined || email === null) return;
+
+		const user = await User.findOne({ email });
+
+		logger.info(user.journal);
+		return res.status(200).json({ message: user.journal });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
 	}
 };
 
@@ -128,4 +175,6 @@ module.exports = {
 	loginUser,
 	protectedRoute,
 	addUserMood,
+	addUserJournal,
+	getAllJournals,
 };

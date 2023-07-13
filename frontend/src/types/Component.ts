@@ -9,10 +9,17 @@ export type moodsType = {
 };
 
 export type editProps = {
-  id: string;
+  journalInfo: journalProps;
+  setState: React.Dispatch<React.SetStateAction<'Edit' | 'Main'>>;
 };
 
 export type mainProps = {
-  setId: React.Dispatch<React.SetStateAction<string>>;
+  setJournalInfo: React.Dispatch<React.SetStateAction<journalProps>>;
   setState: React.Dispatch<React.SetStateAction<'Edit' | 'Main'>>;
+};
+
+export type journalProps = {
+  date: string;
+  message: string;
+  _id: string;
 };

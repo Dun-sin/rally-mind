@@ -1,14 +1,14 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 
 import moods from '@/data/moods';
+import logger from '@/lib/logger';
 import Layout from '@/components/Layout';
 import Protected from '@/components/Protected';
+import { getFromLocalStorage, getCurrentDate } from '@/lib/helper';
 
 import { Icon } from '@iconify/react';
-import { getFromLocalStorage } from '@/lib/helper';
-import logger from '@/lib/logger';
-import Link from 'next/link';
 
 const limit = 250;
 const home = () => {
@@ -88,28 +88,16 @@ const home = () => {
       if (response.ok) {
         logger(data.message);
       } else {
-        logger(`Couldn't update user`);
-        return;
+        logger(`Couldn't add mood`);
       }
     } catch (error) {
       logger(error, 'Error');
-      return;
     }
 
     window.localStorage.setItem('date', date);
     setDisableSelection(true);
     setShowReason(false);
   };
-
-  function getCurrentDate(): string {
-    const date = new Date();
-    const month = date.getMonth().toString().padStart(2, '0');
-    const year = `${date.getFullYear()}`;
-    const day = date.getDate().toString().padStart(2, '0');
-
-    const fullDate = `${year}-${month}-${day}`;
-    return fullDate;
-  }
 
   return (
     <Protected>

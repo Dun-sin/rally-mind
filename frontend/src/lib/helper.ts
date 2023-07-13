@@ -41,3 +41,27 @@ export function getFromSessionStorage(key: string): string | null {
   }
   return null;
 }
+
+export function getCurrentDate(): string {
+  const date = new Date();
+  const month = date.getMonth().toString().padStart(2, '0');
+  const year = `${date.getFullYear()}`;
+  const day = date.getDate().toString().padStart(2, '0');
+
+  const fullDate = `${year}-${month}-${day}`;
+  return fullDate;
+}
+
+export function formatDate(dateString: string) {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  };
+
+  const formattedDate = date.toLocaleDateString('en-US', options);
+
+  return formattedDate;
+}

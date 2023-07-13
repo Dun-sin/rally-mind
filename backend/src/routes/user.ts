@@ -2,14 +2,20 @@ const jwt = require('jsonwebtoken');
 const config = require('../utils/config');
 
 const UserRouter = require('express').Router();
-const UserController = require('../controllers/user');
+const {
+	createUser,
+	loginUser,
+	protectedRoute,
+	addUserMood,
+	addUserJournal,
+	getAllJournals,
+} = require('../controllers/user');
 
-UserRouter.route('/register').post(UserController.createUser);
-UserRouter.route('/login').post(UserController.loginUser);
-UserRouter.route('/updateMood').put(
-	UserController.protectedRoute,
-	UserController.addUserMood,
-);
+UserRouter.route('/register').post(createUser);
+UserRouter.route('/login').post(loginUser);
+UserRouter.route('/updateMood').put(protectedRoute, addUserMood);
+UserRouter.route('/updateJournal').put(protectedRoute, addUserJournal);
+UserRouter.route('/journal').get(protectedRoute, getAllJournals);
 UserRouter.route('/protected').get(async (req: any, res: any) => {
 	const authHeader = req.headers.authorization;
 
