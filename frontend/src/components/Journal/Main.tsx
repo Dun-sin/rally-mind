@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 
 import logger from '@/lib/logger';
-import { formatDate, getFromLocalStorage } from '@/lib/helper';
 import { journalProps, mainProps } from '@/types/Component';
+import Loading from '../Loading';
+import { formatDate, getFromLocalStorage } from '@/lib/helper';
 
 const Main = ({ setJournalInfo, setState }: mainProps) => {
   const [journals, setJournals] = useState<journalProps[]>([]);
+  const [loading, setLoading] = useState(true);
   const handleOnClickJournal = (info: journalProps) => {
     setJournalInfo(info);
     setState('Edit');
@@ -32,6 +34,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
         if (response.ok) {
           logger(data.message);
           setJournals(data.message);
+          setLoading(false);
         } else {
           logger(`Couldn't get all journals`);
         }
@@ -73,26 +76,35 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
         <span className='ml-auto font-medium underline underline-offset-1'>
           Viewing all Journals
         </span>
-        <div className='text-primary flex w-full flex-col gap-5'>
-          {journals.map(({ _id, date, message }) => {
-            return (
-              <div
-                className='bg-brand h-26 max-w-full cursor-pointer rounded-lg px-4 py-4'
-                onClick={() => handleOnClickJournal({ _id, date, message })}
-              >
-                <p className='text-2xl font-bold'>{formatDate(date)}</p>
-                <p className='line-clamp-1 w-full truncate'>
-                  {message.slice(0, 200)}
-                </p>
-              </div>
-            );
-          })}
+        <div
+          className={`text-primary flex w-full flex-col gap-5 ${
+            loading && 'items-center'
+          }`}
+        >
+          {loading ? (
+            <Loading />
+          ) : (
+            journals.map(({ _id, date, message }) => {
+              return (
+                <div
+                  className='bg-brand h-26 max-w-full cursor-pointer rounded-lg px-4 py-4'
+                  onClick={() => handleOnClickJournal({ _id, date, message })}
+                  key={_id}
+                >
+                  <p className='text-2xl font-bold'>{formatDate(date)}</p>
+                  <p className='line-clamp-1 w-full truncate'>
+                    {message.slice(0, 200)}
+                  </p>
+                </div>
+              );
+            })
+          )}
         </div>
       </main>
 
       <Icon
         icon='gridicons:add'
-        className='text-brand absolute bottom-4 right-4 h-14 w-14 cursor-pointer'
+        className='text-brand absolute bottom-4 right-4 h-14 w-14 cursor-pointer z-10'
         onClick={resetJournalInfo}
       />
     </section>
