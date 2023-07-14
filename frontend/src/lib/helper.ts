@@ -1,4 +1,5 @@
 import logger from './logger';
+import { DateTime } from 'luxon';
 
 type OpenGraphType = {
   siteName: string;
@@ -64,4 +65,46 @@ export function formatDate(dateString: string) {
   const formattedDate = date.toLocaleDateString('en-US', options);
 
   return formattedDate;
+}
+
+export const checkStreak = () => {
+  const lastDate = getFromLocalStorage('lastDate');
+  const currentDate = getCurrentDate();
+
+  if (lastDate === currentDate) return;
+  if (lastDate === null || lastDate === undefined) {
+    window.localStorage.setItem('lastDate', currentDate);
+    return;
+  }
+
+  const formattedLastDate = DateTime.fromISO(lastDate || '');
+  const formattedCurrentDate = DateTime.fromISO(getCurrentDate());
+
+  const dateDiff = formattedCurrentDate.diff(formattedLastDate).as('days');
+
+  const noGap = dateDiff <= 1;
+  updateStreak(noGap);
+};
+
+async function updateStreak(noGap: boolean) {
+  const response = await fetch('http://localhost:4000/api/users/updateStreak', {
+    method: 'PUT',
+    headers: {
+      'Content-type': 'application/json',
+      Authorization: `Bearer ${getFromLocalStorage('token')}`,
+    },
+    body: JSON.stringify({
+      email: getFromLocalStorage('email'),
+      //  if noGap in streak(true) then streak is still on
+      isStreakOn: noGap,
+    }),
+  });
+
+  const data = await response.json();
+  if (response.ok) {
+    logger(data.message);
+    window.localStorage.setItem('lastDate', getCurrentDate());
+  } else {
+    logger(`Couldn't update streak`);
+  }
 }

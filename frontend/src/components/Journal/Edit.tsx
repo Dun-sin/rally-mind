@@ -3,7 +3,12 @@ import React, { useEffect, useRef } from 'react';
 import logger from '@/lib/logger';
 import { Icon } from '@iconify/react';
 import { editProps } from '@/types/Component';
-import { formatDate, getCurrentDate, getFromLocalStorage } from '@/lib/helper';
+import {
+  checkStreak,
+  formatDate,
+  getCurrentDate,
+  getFromLocalStorage,
+} from '@/lib/helper';
 
 let type: 'Add' | 'View';
 let date: string;
@@ -47,6 +52,7 @@ const Edit = ({ journalInfo, setState }: editProps) => {
       const data = await response.json();
       if (response.ok) {
         logger(data.message);
+        checkStreak();
         setState('Main');
       } else {
         logger(`Couldn't add journal`);

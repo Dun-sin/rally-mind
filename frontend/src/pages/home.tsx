@@ -6,10 +6,9 @@ import moods from '@/data/moods';
 import logger from '@/lib/logger';
 import Layout from '@/components/Layout';
 import Protected from '@/components/Protected';
-import { getFromLocalStorage, getCurrentDate } from '@/lib/helper';
+import { getFromLocalStorage, getCurrentDate, checkStreak } from '@/lib/helper';
 
 import { Icon } from '@iconify/react';
-import { DateTime } from 'luxon';
 
 const limit = 250;
 const home = () => {
@@ -43,23 +42,6 @@ const home = () => {
     } else {
       setDisableSelection(false);
     }
-
-    const lastDate = getFromLocalStorage('lastDate');
-    const currentDate = getCurrentDate();
-
-    if (lastDate === currentDate) return;
-    if (lastDate === null || lastDate === undefined) {
-      window.localStorage.setItem('lastDate', getCurrentDate());
-      return;
-    }
-
-    const formattedLastDate = DateTime.fromISO(lastDate || '');
-    const formattedCurrentDate = DateTime.fromISO(getCurrentDate());
-
-    const dateDiff = formattedCurrentDate.diff(formattedLastDate).as('days');
-
-    const noGap = dateDiff <= 1;
-    updateStreak(noGap);
   }, []);
 
   const handleMoodClick = (name: string) => {
@@ -106,7 +88,7 @@ const home = () => {
       const data = await response.json();
       if (response.ok) {
         logger(data.message);
-        window.localStorage.setItem('lastDate', date);
+        checkStreak();
       } else {
         logger(`Couldn't add mood`);
       }
@@ -118,32 +100,6 @@ const home = () => {
     setDisableSelection(true);
     setShowReason(false);
   };
-
-  async function updateStreak(noGap: boolean) {
-    const response = await fetch(
-      'http://localhost:4000/api/users/updateStreak',
-      {
-        method: 'PUT',
-        headers: {
-          'Content-type': 'application/json',
-          Authorization: `Bearer ${getFromLocalStorage('token')}`,
-        },
-        body: JSON.stringify({
-          email: getFromLocalStorage('email'),
-          //  if noGap in streak(true) then streak is still on
-          isStreakOn: noGap,
-        }),
-      }
-    );
-
-    const data = await response.json();
-    if (response.ok) {
-      logger(data.message);
-      window.localStorage.setItem('lastDate', getCurrentDate());
-    } else {
-      logger(`Couldn't update streak`);
-    }
-  }
 
   return (
     <Protected>
