@@ -87,7 +87,7 @@ export const checkStreak = () => {
 };
 
 async function updateStreak(noGap: boolean) {
-  const response = await fetch('http://localhost:4000/api/users/updateStreak', {
+  const response = await fetch('http://localhost:4000/api/user/updateStreak', {
     method: 'PUT',
     headers: {
       'Content-type': 'application/json',

@@ -19,7 +19,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
     const getAllJournals = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/api/users/journal?email=${getFromLocalStorage(
+          `http://localhost:4000/api/user/journal?email=${getFromLocalStorage(
             'email'
           )}`,
           {
@@ -104,7 +104,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
 
       <Icon
         icon='gridicons:add'
-        className='text-brand absolute bottom-4 right-4 h-14 w-14 cursor-pointer z-10'
+        className='text-brand absolute bottom-4 right-4 z-10 h-14 w-14 cursor-pointer'
         onClick={resetJournalInfo}
       />
     </section>

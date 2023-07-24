@@ -71,7 +71,7 @@ const home = () => {
 
     try {
       const response = await fetch(
-        'http://localhost:4000/api/users/updateMood',
+        'http://localhost:4000/api/user/updateMood',
         {
           method: 'PUT',
           headers: {
@@ -88,6 +88,8 @@ const home = () => {
       const data = await response.json();
       if (response.ok) {
         logger(data.message);
+        window.localStorage.setItem('date', date);
+        setDisableSelection(true);
         checkStreak();
       } else {
         logger(`Couldn't add mood`);
@@ -96,8 +98,6 @@ const home = () => {
       logger(error, 'Error');
     }
 
-    window.localStorage.setItem('date', date);
-    setDisableSelection(true);
     setShowReason(false);
   };
 

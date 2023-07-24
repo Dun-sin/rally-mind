@@ -21,6 +21,7 @@
   "dependencies": {
     "@iconify/types": "^2.0.0",
     "@types/luxon": "^3.3.0",
+    "@use-it/interval": "^1.0.0",
     "clsx": "^1.2.1",
     "jsonwebtoken": "^9.0.1",
     "luxon": "^3.3.0",

@@ -6,16 +6,23 @@ const {
 	createUser,
 	loginUser,
 	protectedRoute,
-	addUserMood,
-	addUserJournal,
+	updateMood,
+	updateJournal,
 	getAllJournals,
+	updateStreak,
+	getUsersRank,
+	addPoints,
 } = require('../controllers/user');
 
 UserRouter.route('/register').post(createUser);
 UserRouter.route('/login').post(loginUser);
-UserRouter.route('/updateMood').put(protectedRoute, addUserMood);
-UserRouter.route('/updateJournal').put(protectedRoute, addUserJournal);
+UserRouter.route('/updateMood').put(protectedRoute, updateMood);
+UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
 UserRouter.route('/journal').get(protectedRoute, getAllJournals);
+UserRouter.route('/updateStreak').put(protectedRoute, updateStreak);
+UserRouter.route('/addPoints').put(protectedRoute, addPoints);
+UserRouter.route('/rank').get(getUsersRank);
+
 UserRouter.route('/protected').get(async (req: any, res: any) => {
 	const authHeader = req.headers.authorization;
 

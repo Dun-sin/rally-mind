@@ -20,6 +20,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <p className='-m-1 text-[0.3rem]'>Journal</p>
           </div>
         </Link>
+        <Link href='/game'>
+          <div className='flex flex-col items-center justify-center'>
+            <Icon icon='mingcute:game-2-fill' className='text-brand h-8 w-8' />
+            <p className='-m-1 text-[0.3rem]'>Game</p>
+          </div>
+        </Link>
         <Link href='/rank'>
           <div className='flex flex-col items-center justify-center'>
             <Icon
@@ -29,12 +35,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <p className='-m-1 text-[0.3rem]'>Rank</p>
           </div>
         </Link>
-        <Link href='/insights'>
+        {/* <Link href='/insights'>
           <div className='flex flex-col items-center justify-center'>
             <Icon icon='fluent-mdl2:insights' className='text-brand h-8 w-8' />
             <p className='-m-1 text-[0.3rem]'>Insights</p>
           </div>
-        </Link>
+        </Link> */}
       </section>
     </span>
   );

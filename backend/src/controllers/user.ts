@@ -92,7 +92,7 @@ const protectedRoute = (req: any, res: any, next: any) => {
 	}
 };
 
-const addUserMood = async (req: any, res: any) => {
+const updateMood = async (req: any, res: any) => {
 	try {
 		const { email, moodDetails } = req.body;
 
@@ -110,6 +110,9 @@ const addUserMood = async (req: any, res: any) => {
 				$push: {
 					moods: moodDetails,
 				},
+				$inc: {
+					'gamification.points': 10,
+				},
 			},
 			{
 				returnOriginal: false,
@@ -123,7 +126,7 @@ const addUserMood = async (req: any, res: any) => {
 	}
 };
 
-const addUserJournal = async (req: any, res: any) => {
+const updateJournal = async (req: any, res: any) => {
 	try {
 		const { email, journal } = req.body;
 
@@ -140,6 +143,9 @@ const addUserJournal = async (req: any, res: any) => {
 			{
 				$push: {
 					journal: journal,
+				},
+				$inc: {
+					'gamification.points': 25,
 				},
 			},
 			{
@@ -170,11 +176,138 @@ const getAllJournals = async (req: any, res: any) => {
 	}
 };
 
+const updateStreak = async (req: any, res: any) => {
+	try {
+		const { email, isStreakOn } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (isStreakOn === undefined || isStreakOn === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		logger.info(isStreakOn);
+
+		if (isStreakOn) {
+			await User.findOneAndUpdate(
+				{ email: email },
+				{
+					$inc: {
+						'gamification.streak': 1,
+					},
+				},
+				{
+					returnOriginal: false,
+				},
+			);
+		} else {
+			await User.findOneAndUpdate(
+				{ email: email },
+				{
+					'gamification.streak': 0,
+				},
+				{
+					returnOriginal: false,
+				},
+			);
+		}
+
+		return res.status(200).json({ message: `Streak Updated` });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getUsersRank = async (req: any, res: any) => {
+	try {
+		const topUsers: {
+			email: string;
+			points: number;
+		}[] = await User.aggregate([
+			{
+				$sort: { 'gamification.points': -1 },
+			},
+			{
+				$limit: 3,
+			},
+			{
+				$project: {
+					_id: 0,
+					name: '$username',
+					points: '$gamification.points',
+				},
+			},
+		]);
+
+		const remainUsers: {
+			email: string;
+			points: number;
+		}[] = await User.aggregate([
+			{
+				$sort: { 'gamification.points': -1 },
+			},
+			{
+				$skip: 3,
+			},
+			{
+				$project: {
+					_id: 0,
+					name: '$username',
+					points: '$gamification.points',
+				},
+			},
+		]);
+
+		return res.status(200).json({
+			message: {
+				top3: topUsers,
+				others: remainUsers,
+			},
+		});
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const addPoints = async (req: any, res: any) => {
+	try {
+		const { email, points } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (points === undefined || points === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				$inc: {
+					'gamification.points': points,
+				},
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: 'Added Points' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
 	protectedRoute,
-	addUserMood,
-	addUserJournal,
+	updateMood,
+	updateJournal,
 	getAllJournals,
+	updateStreak,
+	getUsersRank,
+	addPoints,
 };

@@ -35,7 +35,7 @@ const Edit = ({ journalInfo, setState }: editProps) => {
 
     try {
       const response = await fetch(
-        'http://localhost:4000/api/users/updateJournal',
+        'http://localhost:4000/api/user/updateJournal',
         {
           method: 'PUT',
           headers: {

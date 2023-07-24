@@ -22,7 +22,7 @@ const Register = () => {
       const checkToken = async () => {
         try {
           const response = await fetch(
-            'http://localhost:4000/api/users/protected',
+            'http://localhost:4000/api/user/protected',
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -33,7 +33,12 @@ const Register = () => {
           const data = await response.json();
 
           window.localStorage.setItem('email', data.message);
-          response.ok ? router.push('/home') : logger(data.message);
+          if (response.ok) {
+            router.push('/home');
+            logger(data.message);
+          } else {
+            logger(data.message);
+          }
         } catch (error) {
           logger(error, 'Error');
         }
@@ -45,7 +50,7 @@ const Register = () => {
 
   const handleSignup = async (signupDetails: signupDetailsType) => {
     try {
-      const response = await fetch('http://localhost:4000/api/users/register', {
+      const response = await fetch('http://localhost:4000/api/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

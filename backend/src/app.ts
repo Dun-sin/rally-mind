@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(middleware.requestLogger);
 
 // endpoints
-app.use('/api/users', UserRoute);
+app.use('/api/user', UserRoute);
 
 // ending middlewares
 app.use(middleware.unknownEndPoint);
