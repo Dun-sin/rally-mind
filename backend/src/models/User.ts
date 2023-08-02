@@ -1,4 +1,4 @@
-import { model, Model, Schema, models, ObjectId } from 'mongoose';
+import { model, Model, Schema, models, ObjectId, Document } from 'mongoose';
 
 export interface IUser extends Document {
 	_id: ObjectId;
