@@ -53,6 +53,38 @@ const Settings: React.FC = () => {
     }
   }
 
+  const logout = () => {
+    window.localStorage.removeItem('token');
+    window.localStorage.removeItem('email');
+    router.push('/');
+  };
+
+  const deleteUser = async () => {
+    try {
+      const response = await fetch(
+        `https://rally-mind.onrender.com/api/user/deleteUser`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${getFromLocalStorage('token')}`,
+          },
+          body: JSON.stringify({ email: getFromLocalStorage('email') }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        logger(data.message, 'message');
+        logout();
+      } else {
+        logger(data.message, 'error');
+      }
+    } catch (error) {
+      logger(error, 'error');
+    }
+  };
+
   return (
     <Protected>
       <Layout>
@@ -114,13 +146,28 @@ const Settings: React.FC = () => {
 
             <section className='text-primary w-full gap-3'>
               <div className='bg-brand flex w-full items-center justify-between rounded-lg px-4 py-4'>
-                <p className='text-lg'>Remind me to Journal Everyday at</p>
+                <p className='text-base'>Remind me to Journal Everyday at</p>
                 <div className='border-primary rounded-md border p-2'>
                   10:00AM
                 </div>
               </div>
             </section>
           </main>
+
+          <footer className='mb-6 flex w-full flex-col items-center gap-4'>
+            <div
+              className='text-primary bg-brand flex h-12 w-2/4 cursor-pointer items-center justify-center rounded-md text-base font-semibold'
+              onClick={logout}
+            >
+              LogOut
+            </div>
+            <div
+              className='text-primary flex h-12 w-2/4 cursor-pointer items-center justify-center rounded-md bg-red-700 text-base font-semibold'
+              onClick={deleteUser}
+            >
+              Delete Your Account
+            </div>
+          </footer>
         </section>
       </Layout>
     </Protected>

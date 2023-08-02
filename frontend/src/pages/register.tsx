@@ -6,14 +6,17 @@ import Seo from '@/components/Seo';
 import { signupDetailsType } from '@/types/User';
 import { getFromLocalStorage } from '@/lib/helper';
 import { useRouter } from 'next/router';
+import Loading from '@/components/Loading';
 
 const Register = () => {
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
+  const genderRef = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
     const token = getFromLocalStorage('token');
@@ -67,13 +70,21 @@ const Register = () => {
         // Store the token in web storage
         localStorage.setItem('token', token);
         console.log('Signup successful');
+        router.push('/home');
       } else {
+        resetInputValues();
+        setLoading(false);
         const error = `SignUp failed: ${data.message}`;
         console.error(error);
         setError(error);
       }
     } catch (error) {
-      console.error(`Error: ${error}`);
+      resetInputValues();
+      setLoading(false);
+
+      const msg = `Error: ${error}`;
+      setError(msg);
+      console.error(msg);
     }
   };
 
@@ -81,17 +92,18 @@ const Register = () => {
     if (
       emailRef.current === null ||
       passwordRef.current === null ||
-      usernameRef.current === null
+      usernameRef.current === null ||
+      genderRef.current === null
     )
       return;
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     const username = usernameRef.current.value;
-    console.log(email, password);
+    const gender = genderRef.current.value;
 
-    handleSignup({ email, password, username });
-    resetInputValues();
+    setLoading(true);
+    handleSignup({ email, password, username, gender });
   };
 
   const resetInputValues = () => {
@@ -137,15 +149,29 @@ const Register = () => {
             className='ring-brand focus:ring-brand h-14 w-2/3 rounded-lg border-0 ring ring-inset focus:ring focus:ring-inset'
             ref={passwordRef}
           />
+          <select
+            id='country'
+            name='country'
+            className='mt-1 block w-2/3 rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+            ref={genderRef}
+          >
+            <option>Male</option>
+            <option>female</option>
+            <option>other</option>
+          </select>
           <p className='w-2/3 text-lg text-red-600'>{error !== '' && error}</p>
         </section>
         <span className='flex flex-col items-center justify-center'>
-          <button
-            className='text-primary bg-brand h-14 w-2/4 rounded-md font-semibold'
-            onClick={handleSubmit}
-          >
-            Sumbit
-          </button>
+          {loading ? (
+            <Loading />
+          ) : (
+            <button
+              className='text-primary bg-brand h-14 w-2/4 rounded-md font-semibold'
+              onClick={handleSubmit}
+            >
+              Sumbit
+            </button>
+          )}
           <div className='flex gap-3'>
             <span>Already have an account?</span>
             <Link href='/' className='text-brand font-bold'>

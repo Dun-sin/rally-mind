@@ -99,6 +99,7 @@ export default function SnakeGame() {
   };
 
   const updatePoint = async (score: number) => {
+    if (score === 0) return;
     try {
       const response = await fetch(
         'https://rally-mind.onrender.com/api/user/addPoints',

@@ -10,6 +10,7 @@ import { formatDate, getFromLocalStorage } from '@/lib/helper';
 const Main = ({ setJournalInfo, setState }: mainProps) => {
   const [journals, setJournals] = useState<journalProps[]>([]);
   const [loading, setLoading] = useState(true);
+
   const handleOnClickJournal = (info: journalProps) => {
     setJournalInfo(info);
     setState('Edit');
@@ -46,7 +47,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
     getAllJournals();
   }, []);
 
-  const resetJournalInfo = () => {
+  const addJournal = () => {
     setJournalInfo({ _id: '', message: '', date: '' });
     setState('Edit');
   };
@@ -105,7 +106,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
       <Icon
         icon='gridicons:add'
         className='text-brand absolute bottom-4 right-4 z-10 h-14 w-14 cursor-pointer'
-        onClick={resetJournalInfo}
+        onClick={addJournal}
       />
     </section>
   );

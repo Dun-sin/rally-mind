@@ -6,9 +6,11 @@ import Seo from '@/components/Seo';
 import { useRouter } from 'next/router';
 import { loginDetailsType } from '@/types/User';
 import { getFromLocalStorage } from '@/lib/helper';
+import Loading from '@/components/Loading';
 
 const Login = () => {
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const emailRef = useRef<HTMLInputElement>(null);
@@ -65,11 +67,17 @@ const Login = () => {
 
         router.push('/home');
       } else {
+        setLoading(false);
+        resetInputValues();
+
         const error = `Login failed: ${data.message}`;
         logger(error);
         setError(error);
       }
     } catch (error) {
+      resetInputValues();
+      setLoading(false);
+      setError(`Error: ${error}`);
       console.error(`Error: ${error}`);
     }
   };
@@ -79,10 +87,9 @@ const Login = () => {
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-    console.log(email, password);
 
+    setLoading(true);
     handleLogin({ email, password });
-    resetInputValues();
   };
 
   const resetInputValues = () => {
@@ -117,12 +124,16 @@ const Login = () => {
           <p className='w-2/3 text-lg text-red-600'>{error !== '' && error}</p>
         </section>
         <span className='flex flex-col items-center justify-center'>
-          <button
-            className='text-primary bg-brand h-14 w-2/4 rounded-md font-semibold'
-            onClick={handleSubmit}
-          >
-            Sumbit
-          </button>
+          {loading ? (
+            <Loading />
+          ) : (
+            <button
+              className='text-primary bg-brand h-14 w-2/4 rounded-md font-semibold'
+              onClick={handleSubmit}
+            >
+              Sumbit
+            </button>
+          )}
           <div className='flex gap-3'>
             <span>Don't have an account yet?</span>
             <Link href='/register' className='text-brand font-bold'>

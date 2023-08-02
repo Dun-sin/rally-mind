@@ -5,6 +5,7 @@ export type loginDetailsType = {
 
 export interface signupDetailsType extends loginDetailsType {
   username: string;
+  gender: string;
 }
 
 export type rank = {

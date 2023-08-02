@@ -45,7 +45,7 @@ export function getFromSessionStorage(key: string): string | null {
 
 export function getCurrentDate(): string {
   const date = new Date();
-  const month = date.getMonth().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add 1 to get the correct month index
   const year = `${date.getFullYear()}`;
   const day = date.getDate().toString().padStart(2, '0');
 
@@ -54,15 +54,34 @@ export function getCurrentDate(): string {
 }
 
 export function formatDate(dateString: string) {
+  // Convert the input date string to a Date object
   const date = new Date(dateString);
 
-  const options: Intl.DateTimeFormatOptions = {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  };
+  // Define an array to map the month index to the month name
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
 
-  const formattedDate = date.toLocaleDateString('en-US', options);
+  // Extract the day, month, and year from the Date object
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+
+  // Format the date as 'MMM DD, YYYY' (e.g., 'Aug 02, 2023')
+  const formattedDate = `${months[monthIndex]} ${day
+    .toString()
+    .padStart(2, '0')}, ${year}`;
 
   return formattedDate;
 }

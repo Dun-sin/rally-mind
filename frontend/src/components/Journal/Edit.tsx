@@ -14,7 +14,11 @@ let type: 'Add' | 'View';
 let date: string;
 
 const Edit = ({ journalInfo, setState }: editProps) => {
-  if (journalInfo._id === '') {
+  if (
+    journalInfo._id === '' ||
+    journalInfo === undefined ||
+    journalInfo === null
+  ) {
     type = 'Add';
     date = getCurrentDate();
   } else {
@@ -29,13 +33,73 @@ const Edit = ({ journalInfo, setState }: editProps) => {
     if (text === '' || text === undefined) return;
 
     const journal = {
+      id: journalInfo._id,
       date,
       message: text,
     };
 
+    if (type === 'Add') {
+      try {
+        const response = await fetch(
+          'https://rally-mind.onrender.com/api/user/updateJournal',
+          {
+            method: 'PUT',
+            headers: {
+              'Content-type': 'application/json',
+              Authorization: `Bearer ${getFromLocalStorage('token')}`,
+            },
+            body: JSON.stringify({
+              email: getFromLocalStorage('email'),
+              journal,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          logger(data.message);
+          checkStreak();
+          setState('Main');
+        } else {
+          logger(`Couldn't add journal`);
+        }
+      } catch (error) {
+        logger(error, 'Error');
+      }
+    } else if (type === 'View') {
+      try {
+        const response = await fetch(
+          `https://rally-mind.onrender.com/api/user/updateOneJournal`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-type': 'application/json',
+              Authorization: `Bearer ${getFromLocalStorage('token')}`,
+            },
+            body: JSON.stringify({
+              email: getFromLocalStorage('email'),
+              journal,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          logger(data.message);
+          setState('Main');
+        } else {
+          logger(`Couldn't update journal`);
+        }
+      } catch (error) {
+        logger(error, 'Error');
+      }
+    }
+  };
+
+  const deleteJournal = async () => {
     try {
       const response = await fetch(
-        'https://rally-mind.onrender.com/api/user/updateJournal',
+        `https://rally-mind.onrender.com/api/user/deleteOneJournal`,
         {
           method: 'PUT',
           headers: {
@@ -44,7 +108,7 @@ const Edit = ({ journalInfo, setState }: editProps) => {
           },
           body: JSON.stringify({
             email: getFromLocalStorage('email'),
-            journal,
+            id: journalInfo._id,
           }),
         }
       );
@@ -52,10 +116,9 @@ const Edit = ({ journalInfo, setState }: editProps) => {
       const data = await response.json();
       if (response.ok) {
         logger(data.message);
-        checkStreak();
         setState('Main');
       } else {
-        logger(`Couldn't add journal`);
+        logger(`Couldn't delete journal`);
       }
     } catch (error) {
       logger(error, 'Error');
@@ -78,11 +141,18 @@ const Edit = ({ journalInfo, setState }: editProps) => {
             className='text-primary h-8 w-8 cursor-pointer'
             onClick={() => setState('Main')}
           />
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-4'>
             <Icon
               icon='mingcute:information-fill'
               className='text-primary h-8 w-8 cursor-pointer'
             />
+
+            <Icon
+              icon='ic:baseline-delete'
+              className='h-8 w-8 cursor-pointer text-red-600'
+              onClick={deleteJournal}
+            />
+
             <Icon
               icon='material-symbols:done-rounded'
               className='text-primary h-8 w-8 cursor-pointer'
