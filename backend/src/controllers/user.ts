@@ -36,7 +36,7 @@ const createUser = async (req: any, res: any) => {
 			email,
 			password: passwordHash,
 			username,
-			gender,
+			gender: gender.toLowerCase(),
 		};
 
 		const user = new User(userDetails);
