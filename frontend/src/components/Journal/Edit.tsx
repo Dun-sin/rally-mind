@@ -32,13 +32,11 @@ const Edit = ({ journalInfo, setState }: editProps) => {
     if (date === '') return;
     if (text === '' || text === undefined) return;
 
-    const journal = {
-      id: journalInfo._id,
-      date,
-      message: text,
-    };
-
     if (type === 'Add') {
+      const journal = {
+        date,
+        message: text,
+      };
       try {
         const response = await fetch(
           'https://rally-mind.onrender.com/api/user/updateJournal',
@@ -67,6 +65,12 @@ const Edit = ({ journalInfo, setState }: editProps) => {
         logger(error, 'Error');
       }
     } else if (type === 'View') {
+      const journal = {
+        id: journalInfo._id,
+        date,
+        message: text,
+      };
+
       try {
         const response = await fetch(
           `https://rally-mind.onrender.com/api/user/updateOneJournal`,

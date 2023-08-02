@@ -54,8 +54,7 @@ const Settings: React.FC = () => {
   }
 
   const logout = () => {
-    window.localStorage.removeItem('token');
-    window.localStorage.removeItem('email');
+    window.localStorage.clear();
     router.push('/');
   };
 

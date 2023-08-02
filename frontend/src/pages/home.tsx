@@ -150,7 +150,7 @@ const Home: React.FC = () => {
                       name='reason'
                       id='reason'
                       className='ring-brand focus:ring-brand h-full w-full resize-none rounded-lg border-0 ring ring-inset focus:ring focus:ring-inset'
-                      placeholder='Why are you feeling that way?'
+                      placeholder={`Why are you feeling ${mood}?`}
                       ref={textareaRef}
                       onChange={handleChange}
                     />
