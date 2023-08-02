@@ -14,6 +14,7 @@ const createUser = async (req: any, res: any) => {
 		}
 
 		const { email, password, username, gender } = req.body;
+		logger.info({ email, password, username, gender })
 		const existingUser = await User.findOne({ email });
 		const exisitingUsername = await User.findOne({ username });
 
