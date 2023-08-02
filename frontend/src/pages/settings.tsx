@@ -30,7 +30,7 @@ const Settings: React.FC = () => {
   async function getUserProfile() {
     try {
       const response = await fetch(
-        `http://localhost:4000/api/user/userProfile?email=${getFromLocalStorage(
+        `https://rally-mind.onrender.com/api/user/userProfile?email=${getFromLocalStorage(
           'email'
         )}`,
         {

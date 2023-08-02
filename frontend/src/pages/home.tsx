@@ -72,7 +72,7 @@ const Home: React.FC = () => {
 
     try {
       const response = await fetch(
-        'http://localhost:4000/api/user/updateMood',
+        'https://rally-mind.onrender.com/api/user/updateMood',
         {
           method: 'PUT',
           headers: {

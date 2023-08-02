@@ -20,7 +20,9 @@ const Rank: React.FC = () => {
 
   async function getUsersRank() {
     try {
-      const response = await fetch('http://localhost:4000/api/user/rank');
+      const response = await fetch(
+        'https://rally-mind.onrender.com/api/user/rank'
+      );
       const data = await response.json();
 
       if (response.ok) {

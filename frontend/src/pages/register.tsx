@@ -22,7 +22,7 @@ const Register = () => {
       const checkToken = async () => {
         try {
           const response = await fetch(
-            'http://localhost:4000/api/user/protected',
+            'https://rally-mind.onrender.com/api/user/protected',
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -50,13 +50,16 @@ const Register = () => {
 
   const handleSignup = async (signupDetails: signupDetailsType) => {
     try {
-      const response = await fetch('http://localhost:4000/api/user/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...signupDetails }),
-      });
+      const response = await fetch(
+        'https://rally-mind.onrender.com/api/user/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ...signupDetails }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {

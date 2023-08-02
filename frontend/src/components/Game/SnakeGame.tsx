@@ -100,17 +100,20 @@ export default function SnakeGame() {
 
   const updatePoint = async (score: number) => {
     try {
-      const response = await fetch('http://localhost:4000/api/user/addPoints', {
-        method: 'PUT',
-        headers: {
-          'Content-type': 'application/json',
-          Authorization: `Bearer ${getFromLocalStorage('token')}`,
-        },
-        body: JSON.stringify({
-          email: getFromLocalStorage('email'),
-          points: score,
-        }),
-      });
+      const response = await fetch(
+        'https://rally-mind.onrender.com/api/user/addPoints',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${getFromLocalStorage('token')}`,
+          },
+          body: JSON.stringify({
+            email: getFromLocalStorage('email'),
+            points: score,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         logger(data.message);

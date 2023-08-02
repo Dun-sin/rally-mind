@@ -19,7 +19,7 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
     const getAllJournals = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/api/user/journal?email=${getFromLocalStorage(
+          `https://rally-mind.onrender.com/api/user/journal?email=${getFromLocalStorage(
             'email'
           )}`,
           {

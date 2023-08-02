@@ -87,18 +87,21 @@ export const checkStreak = () => {
 };
 
 async function updateStreak(noGap: boolean) {
-  const response = await fetch('http://localhost:4000/api/user/updateStreak', {
-    method: 'PUT',
-    headers: {
-      'Content-type': 'application/json',
-      Authorization: `Bearer ${getFromLocalStorage('token')}`,
-    },
-    body: JSON.stringify({
-      email: getFromLocalStorage('email'),
-      //  if noGap in streak(true) then streak is still on
-      isStreakOn: noGap,
-    }),
-  });
+  const response = await fetch(
+    'https://rally-mind.onrender.com/api/user/updateStreak',
+    {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json',
+        Authorization: `Bearer ${getFromLocalStorage('token')}`,
+      },
+      body: JSON.stringify({
+        email: getFromLocalStorage('email'),
+        //  if noGap in streak(true) then streak is still on
+        isStreakOn: noGap,
+      }),
+    }
+  );
 
   const data = await response.json();
   if (response.ok) {

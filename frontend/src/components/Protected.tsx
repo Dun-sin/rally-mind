@@ -10,11 +10,14 @@ const Protected = ({ children }: protectedProps) => {
 
   const fetchData = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:4000/api/user/protected', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        'https://rally-mind.onrender.com/api/user/protected',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
       !response.ok && router.push('/');
