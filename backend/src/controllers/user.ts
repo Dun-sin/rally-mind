@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { Types } = require('mongoose');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 const logger = require('../utils/logger');
@@ -13,7 +13,7 @@ const createUser = async (req: any, res: any) => {
 			return res.status(401).json({ message: 'invalid credentials' });
 		}
 
-		const { email, password, username } = req.body;
+		const { email, password, username, gender } = req.body;
 		const existingUser = await User.findOne({ email });
 		const exisitingUsername = await User.findOne({ username });
 
@@ -36,6 +36,7 @@ const createUser = async (req: any, res: any) => {
 			email,
 			password: passwordHash,
 			username,
+			gender,
 		};
 
 		const user = new User(userDetails);
@@ -70,6 +71,27 @@ const loginUser = async (req: any, res: any) => {
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({ message: 'Failed to login user' });
+	}
+};
+
+const deleteUser = async (req: any, res: any) => {
+	try {
+		const { email } = req.body;
+
+		console.log(email);
+
+		if (email === undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		await User.findOneAndDelete({ email: email });
+
+		return res.status(200).json({ message: `Account Deleted` });
+	} catch (error) {
+		logger.error(error);
+		return res
+			.status(500)
+			.json({ message: `Internal Server Error: Couldn't delete account` });
 	}
 };
 
@@ -136,8 +158,6 @@ const updateJournal = async (req: any, res: any) => {
 			return res.status(400).json({ message: 'No data was provided' });
 		}
 
-		logger.info(journal, 'Journal');
-
 		await User.findOneAndUpdate(
 			{ email: email },
 			{
@@ -154,6 +174,66 @@ const updateJournal = async (req: any, res: any) => {
 		);
 
 		return res.status(200).json({ message: 'Journal added' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+const updateOneJournal = async (req: any, res: any) => {
+	try {
+		const { email, journal } = req.body;
+
+		logger.info(journal);
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No id was provided' });
+		} else if (journal === undefined || journal === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		const updateData = {
+			'journal.$[element].date': new Date(),
+			'journal.$[element].message': journal.message,
+		};
+
+		const options = {
+			arrayFilters: [
+				{ 'element._id': new mongoose.Types.ObjectId(journal.id) },
+			],
+			new: true,
+		};
+
+		await User.findOneAndUpdate({ email: email }, updateData, options);
+
+		return res.status(200).json({ message: 'Journal Updated' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+const deleteOneJournal = async (req: any, res: any) => {
+	try {
+		const { email, id } = req.body;
+
+		logger.info(id);
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No id was provided' });
+		} else if (id === undefined || id === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		const updateData = {
+			$pull: { journal: { _id: new mongoose.Types.ObjectId(id) } },
+		};
+
+		const options = {
+			new: true,
+		};
+
+		await User.findOneAndUpdate({ email: email }, updateData, options);
+
+		return res.status(200).json({ message: 'Journal Deleted' });
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({ message: 'Internal Server Error' });
@@ -338,4 +418,7 @@ module.exports = {
 	getUsersRank,
 	addPoints,
 	getUserProfile,
+	deleteUser,
+	updateOneJournal,
+	deleteOneJournal,
 };

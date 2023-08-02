@@ -13,17 +13,23 @@ const {
 	getUsersRank,
 	addPoints,
 	getUserProfile,
+	deleteUser,
+	updateOneJournal,
+	deleteOneJournal,
 } = require('../controllers/user');
 
 // POST endpoints
 UserRouter.route('/register').post(createUser);
 UserRouter.route('/login').post(loginUser);
+UserRouter.route('/deleteUser').post(protectedRoute, deleteUser);
 
 // PUT endpoints
 UserRouter.route('/updateMood').put(protectedRoute, updateMood);
-UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
 UserRouter.route('/updateStreak').put(protectedRoute, updateStreak);
 UserRouter.route('/addPoints').put(protectedRoute, addPoints);
+UserRouter.route('/updateOneJournal').put(protectedRoute, updateOneJournal);
+UserRouter.route('/deleteOneJournal').put(protectedRoute, deleteOneJournal);
+UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
 
 // Get endpoints
 UserRouter.route('/journal').get(protectedRoute, getAllJournals);
