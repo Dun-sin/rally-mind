@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import useInterval from '@use-it/interval';
 
 import { Icon } from '@iconify/react';
-import { getCurrentDate, getFromLocalStorage } from '@/lib/helper';
+import { checkStreak, getCurrentDate, getFromLocalStorage } from '@/lib/helper';
 import logger from '@/lib/logger';
 
 type Apple = {
@@ -115,6 +115,7 @@ export default function SnakeGame() {
       if (response.ok) {
         logger(data.message);
         window.localStorage.setItem('GameDate', getCurrentDate());
+        checkStreak();
       } else {
         logger(data.message);
       }
@@ -357,7 +358,7 @@ export default function SnakeGame() {
             velocity = { dx: 0, dy: -1 };
             break;
           default:
-            console.error('Error with handleKeyDown');
+            throw Error('Error with handleKeyDown');
         }
         if (
           !(
@@ -392,7 +393,7 @@ export default function SnakeGame() {
         velocity = { dx: 0, dy: -1 };
         break;
       default:
-        console.error('Error with handleKeyDown');
+        throw Error('Error with handleKeyDown');
     }
     if (
       !(
@@ -447,9 +448,7 @@ export default function SnakeGame() {
         </section>
 
         {isLost && (
-          <div
-            className={`bg-primary absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 transform items-center justify-center`}
-          >
+          <div className='bg-primary absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 transform items-center justify-center'>
             <span className='flex flex-col items-center gap-4'>
               <p className='text-3xl font-bold'>Game Over</p>
               <p className=' font-light'>

@@ -6,7 +6,7 @@ import Edit from '@/components/Journal/Edit';
 import Protected from '@/components/Protected';
 import { journalProps } from '@/types/Component';
 
-const journal = () => {
+const Journal: React.FC = () => {
   const [state, setState] = useState<'Edit' | 'Main'>('Main');
   const [journalInfo, setjournalInfo] = useState<journalProps>({
     _id: '',
@@ -28,4 +28,4 @@ const journal = () => {
   );
 };
 
-export default journal;
+export default Journal;

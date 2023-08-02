@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react';
 import logger from '@/lib/logger';
 import Loading from '@/components/Loading';
 
-const rank = () => {
+const Rank: React.FC = () => {
   const [ranks, setRanks] = useState<rank>({
     top3: [],
     others: [],
@@ -94,4 +94,4 @@ const rank = () => {
   );
 };
 
-export default rank;
+export default Rank;

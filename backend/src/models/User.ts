@@ -5,6 +5,7 @@ export interface IUser extends Document {
 	username: string;
 	email: string;
 	avatarUrl: string;
+	gender: 'female' | 'male' | 'other';
 	moods: {
 		date: Date;
 		mood: string;
@@ -37,6 +38,7 @@ const UserSchema: Schema = new Schema<IUserDocument, IUserModel>({
 	username: { type: String, required: true, unique: true },
 	email: { type: String, required: true, unique: true },
 	avatarUrl: { type: String },
+	gender: { type: String, enum: ['male', 'female', 'other'], default: 'other' },
 	moods: [
 		{
 			date: { type: Date, required: true },

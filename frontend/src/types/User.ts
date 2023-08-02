@@ -16,3 +16,13 @@ type ranktype = {
   name: string;
   points: number;
 };
+
+export type profile = {
+  username: string | null;
+  gender: 'male' | 'female' | 'others';
+  email: string | null;
+  gamification: {
+    points: number;
+    streak: number;
+  } | null;
+};

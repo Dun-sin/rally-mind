@@ -11,7 +11,8 @@ import { getFromLocalStorage, getCurrentDate, checkStreak } from '@/lib/helper';
 import { Icon } from '@iconify/react';
 
 const limit = 250;
-const home = () => {
+
+const Home: React.FC = () => {
   const [mood, setMood] = useState('');
   const [showReason, setShowReason] = useState(false);
   const [disableSelection, setDisableSelection] = useState(false);
@@ -207,4 +208,4 @@ const home = () => {
   );
 };
 
-export default home;
+export default Home;

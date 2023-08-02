@@ -12,15 +12,22 @@ const {
 	updateStreak,
 	getUsersRank,
 	addPoints,
+	getUserProfile,
 } = require('../controllers/user');
 
+// POST endpoints
 UserRouter.route('/register').post(createUser);
 UserRouter.route('/login').post(loginUser);
+
+// PUT endpoints
 UserRouter.route('/updateMood').put(protectedRoute, updateMood);
 UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
-UserRouter.route('/journal').get(protectedRoute, getAllJournals);
 UserRouter.route('/updateStreak').put(protectedRoute, updateStreak);
 UserRouter.route('/addPoints').put(protectedRoute, addPoints);
+
+// Get endpoints
+UserRouter.route('/journal').get(protectedRoute, getAllJournals);
+UserRouter.route('/userProfile').get(protectedRoute, getUserProfile);
 UserRouter.route('/rank').get(getUsersRank);
 
 UserRouter.route('/protected').get(async (req: any, res: any) => {

@@ -300,6 +300,33 @@ const addPoints = async (req: any, res: any) => {
 	}
 };
 
+const getUserProfile = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+		const details = {
+			username: user.username,
+			email: user.email,
+			gender: user.gender,
+			gamification: {
+				points: user.gamification.points,
+				streak: user.gamification.streak,
+			},
+		};
+
+		logger.info(details);
+		return res.status(200).json({ message: details });
+	} catch (error) {
+		logger.error(error);
+		return res.staus(500).json({ message: 'Internal Server Error' });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
@@ -310,4 +337,5 @@ module.exports = {
 	updateStreak,
 	getUsersRank,
 	addPoints,
+	getUserProfile,
 };
