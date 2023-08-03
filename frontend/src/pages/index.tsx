@@ -85,7 +85,7 @@ const Login = () => {
   const handleSubmit = () => {
     if (emailRef.current === null || passwordRef.current === null) return;
 
-    const email = emailRef.current.value;
+    const email = emailRef.current.value.toLowerCase();
     const password = passwordRef.current.value;
 
     setLoading(true);

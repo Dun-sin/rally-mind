@@ -97,10 +97,10 @@ const Register = () => {
     )
       return;
 
-    const email = emailRef.current.value;
+    const email = emailRef.current.value.toLowerCase();
     const password = passwordRef.current.value;
     const username = usernameRef.current.value;
-    const gender = genderRef.current.value;
+    const gender = genderRef.current.value.toLowerCase();
 
     setLoading(true);
     handleSignup({ email, password, username, gender });

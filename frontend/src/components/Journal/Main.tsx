@@ -53,9 +53,9 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
   };
 
   return (
-    <section className='relative flex h-full w-full flex-col gap-6'>
+    <section className='relative flex h-full w-full flex-col gap-4'>
       <header
-        className='bg-brand text-primary flex h-[35%] w-full flex-col gap-16 px-6 py-8'
+        className='bg-brand text-primary flex h-[32%] w-full flex-col gap-16 px-6 py-8'
         style={{
           clipPath: 'polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%)',
         }}
@@ -73,12 +73,18 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
         </div>
       </header>
 
-      <main className='relative flex w-full flex-col gap-2 px-6'>
+      <Icon
+        icon='gridicons:add'
+        className='text-brand absolute bottom-2 right-4 z-20 h-14 w-14 cursor-pointer'
+        onClick={addJournal}
+      />
+
+      <main className='relative z-10 mb-14 flex h-[60%] w-full flex-col gap-2 px-6'>
         <span className='ml-auto font-medium underline underline-offset-1'>
           Viewing all Journals
         </span>
         <div
-          className={`text-primary flex w-full flex-col gap-5 ${
+          className={`text-primary flex h-full w-full flex-col gap-3 overflow-y-auto ${
             loading && 'items-center'
           }`}
         >
@@ -102,12 +108,6 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
           )}
         </div>
       </main>
-
-      <Icon
-        icon='gridicons:add'
-        className='text-brand absolute bottom-4 right-4 z-10 h-14 w-14 cursor-pointer'
-        onClick={addJournal}
-      />
     </section>
   );
 };

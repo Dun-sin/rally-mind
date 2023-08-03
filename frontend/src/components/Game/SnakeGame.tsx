@@ -54,7 +54,31 @@ export default function SnakeGame() {
   useEffect(() => {
     const width = Number(mainRef.current?.offsetWidth);
     setCanvasSize({ canvasWidth: width, canvasHeight: width * 0.76 });
+
+    getHighScore();
   }, []);
+
+  async function getHighScore() {
+    const response = await fetch(
+      `https://rally-mind.onrender.com/api/user/updateHighScore?email=${getFromLocalStorage(
+        'email'
+      )}`,
+      {
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${getFromLocalStorage('token')}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      logger(data.message, 'highScore');
+      setHighscore(data.message);
+    } else {
+      logger(data.message, 'error');
+    }
+  }
 
   const clearCanvas = (ctx: CanvasRenderingContext2D) => {
     return ctx.clearRect(
@@ -129,10 +153,31 @@ export default function SnakeGame() {
   };
 
   // Reset state and check for highscore
-  const gameOver = () => {
+  const gameOver = async () => {
     if (score > highscore) {
       setHighscore(score);
-      localStorage.setItem('highscore', score.toString());
+      const response = await fetch(
+        'https://rally-mind.onrender.com/api/user/updateHighScore',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${getFromLocalStorage('token')}`,
+          },
+          body: JSON.stringify({
+            email: getFromLocalStorage('email'),
+            score,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        logger(data.message);
+        localStorage.setItem('highscore', score.toString());
+      } else {
+        logger(`Couldn't update streak`);
+      }
       setNewHighscore(true);
     }
     setIsLost(true);

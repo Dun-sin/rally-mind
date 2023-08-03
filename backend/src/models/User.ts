@@ -12,10 +12,12 @@ export interface IUser extends Document {
 		reason: string;
 	}[];
 	password: string;
+	lastLogin: Date;
 	gamification: {
 		points: number;
 		streak: number;
 		level: number;
+		highScore: number;
 	};
 	songs: {
 		energized: string[] | null;
@@ -46,11 +48,13 @@ const UserSchema: Schema = new Schema<IUserDocument, IUserModel>({
 			reason: { type: String, required: true },
 		},
 	],
+	lastLogin: { type: Date },
 	password: { type: String, required: true },
 	gamification: {
 		points: { type: Number, required: true, default: 0 },
 		streak: { type: Number, required: true, default: 0 },
 		level: { type: Number, required: true, default: 1 },
+		highScore: { type: Number, default: 0 },
 	},
 	songs: {
 		energized: [{ type: String }],

@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <span className='relative flex h-screen w-screen flex-col'>
       <section className='bg-primary h-[93%]'>{children}</section>
-      <section className='border-t-brand fixed bottom-0 z-40 flex h-[7%] w-full items-center justify-center gap-16 rounded-s-md border-t-2'>
+      <section className='border-t-brand bg-primary fixed bottom-0 z-40 flex h-[7%] w-full items-center justify-center gap-16 rounded-s-md border-t-2'>
         <Link href='/home'>
           <div className='flex flex-col items-center justify-center'>
             <Icon icon='heroicons:home-solid' className='text-brand h-8 w-8' />

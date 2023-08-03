@@ -43,8 +43,13 @@ export function getFromSessionStorage(key: string): string | null {
   return null;
 }
 
-export function getCurrentDate(): string {
-  const date = new Date();
+export function getCurrentDate(dateString?: Date): string {
+  let date;
+  if (dateString === null || dateString === undefined) {
+    date = new Date();
+  } else {
+    date = dateString;
+  }
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add 1 to get the correct month index
   const year = `${date.getFullYear()}`;
   const day = date.getDate().toString().padStart(2, '0');
@@ -86,14 +91,65 @@ export function formatDate(dateString: string) {
   return formattedDate;
 }
 
-export const checkStreak = () => {
-  const lastDate = getFromLocalStorage('lastDate');
+const updateLastLoginDate = async () => {
+  try {
+    const response = await fetch(
+      'https://rally-mind.onrender.com/api/user/updateLastLogin',
+      {
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${getFromLocalStorage('token')}`,
+        },
+        body: JSON.stringify({
+          email: getFromLocalStorage('email'),
+          date: new Date(),
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      logger(data.message);
+      window.localStorage.setItem('lastDate', getCurrentDate());
+    } else {
+      logger(`Couldn't update last login`);
+    }
+  } catch (error) {}
+};
+
+export const checkStreak = async () => {
+  let lastDate = getFromLocalStorage('lastDate');
   const currentDate = getCurrentDate();
 
   if (lastDate === currentDate) return;
   if (lastDate === null || lastDate === undefined) {
-    window.localStorage.setItem('lastDate', currentDate);
-    return;
+    const response = await fetch(
+      `https://rally-mind.onrender.com/api/user/updateLastLogin?email=${getFromLocalStorage(
+        'email'
+      )}`,
+      {
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${getFromLocalStorage('token')}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      logger(data.message, 'Last Login');
+      if (getCurrentDate(data.message) === getCurrentDate()) {
+        return;
+      } else if (data.message === null || data.message === undefined) {
+        updateLastLoginDate();
+        return;
+      } else {
+        lastDate = getCurrentDate(data.message);
+      }
+    } else {
+      logger(data.message, 'error');
+    }
   }
 
   const formattedLastDate = DateTime.fromISO(lastDate || '');
@@ -125,7 +181,7 @@ async function updateStreak(noGap: boolean) {
   const data = await response.json();
   if (response.ok) {
     logger(data.message);
-    window.localStorage.setItem('lastDate', getCurrentDate());
+    updateLastLoginDate();
   } else {
     logger(`Couldn't update streak`);
   }

@@ -138,22 +138,22 @@ const Edit = ({ journalInfo, setState }: editProps) => {
 
   return (
     <section className='h-full w-full'>
-      <header className='bg-brand flex h-[14%] w-full flex-col justify-between rounded-b-2xl px-4 py-3'>
+      <header className='bg-brand flex h-[14%] w-full flex-col justify-between rounded-b-2xl px-4 py-5'>
         <div className='flex items-center justify-between'>
           <Icon
             icon='ion:arrow-back'
             className='text-primary h-8 w-8 cursor-pointer'
             onClick={() => setState('Main')}
           />
-          <div className='flex items-center gap-4'>
-            <Icon
+          <div className='flex items-center gap-6'>
+            {/* <Icon
               icon='mingcute:information-fill'
               className='text-primary h-8 w-8 cursor-pointer'
-            />
+            /> */}
 
             <Icon
               icon='ic:baseline-delete'
-              className='h-8 w-8 cursor-pointer text-red-600'
+              className='h-8 w-8 cursor-pointer text-red-500'
               onClick={deleteJournal}
             />
 

@@ -16,7 +16,12 @@ const {
 	deleteUser,
 	updateOneJournal,
 	deleteOneJournal,
+	updateLastLogin,
+	updateHighScore,
+	getHighScore,
+	getLastLogin,
 } = require('../controllers/user');
+const { User } = require('../models/User');
 
 // POST endpoints
 UserRouter.route('/register').post(createUser);
@@ -30,6 +35,12 @@ UserRouter.route('/addPoints').put(protectedRoute, addPoints);
 UserRouter.route('/updateOneJournal').put(protectedRoute, updateOneJournal);
 UserRouter.route('/deleteOneJournal').put(protectedRoute, deleteOneJournal);
 UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
+UserRouter.route('/updateLastLogin')
+	.put(protectedRoute, updateLastLogin)
+	.get(protectedRoute, getLastLogin);
+UserRouter.route('/updateHighScore')
+	.put(protectedRoute, updateHighScore)
+	.get(protectedRoute, getHighScore);
 
 // Get endpoints
 UserRouter.route('/journal').get(protectedRoute, getAllJournals);
@@ -43,10 +54,16 @@ UserRouter.route('/protected').get(async (req: any, res: any) => {
 		const token = authHeader.split(' ')[1];
 
 		try {
-			jwt.verify(token, config.SECRET, (err: any, decoded: any) => {
+			jwt.verify(token, config.SECRET, async (err: any, decoded: any) => {
 				if (err) {
 					res.status(401).json({ message: 'invalid token' });
 				} else {
+					const user = await User.findOne({ email: decoded.email });
+					if (!user) {
+						return res.status(400).json({
+							message: 'User doesn`t exist',
+						});
+					}
 					res.status(200).json({ message: decoded.email });
 				}
 			});

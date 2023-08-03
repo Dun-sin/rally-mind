@@ -101,11 +101,20 @@ const protectedRoute = (req: any, res: any, next: any) => {
 	if (authHeader) {
 		const token = authHeader.split(' ')[1];
 
-		jwt.verify(token, config.SECRET, (err: any, decoded: any) => {
+		jwt.verify(token, config.SECRET, async (err: any, decoded: any) => {
 			if (err) {
 				res.status(401).json({ message: 'Invalid token' });
 			} else {
-				req.user = decoded.email; // Assign the decoded email to the request object
+				// Assign the decoded email to the request object
+				req.user = decoded.email;
+
+				// check if user exists
+				const user = await User.findOne({ email: decoded.email });
+				if (!user) {
+					return res.status(400).json({
+						message: 'User doesn`t exist',
+					});
+				}
 				next();
 			}
 		});
@@ -266,8 +275,6 @@ const updateStreak = async (req: any, res: any) => {
 			return res.status(400).json({ message: 'No data was provided' });
 		}
 
-		logger.info(isStreakOn);
-
 		if (isStreakOn) {
 			await User.findOneAndUpdate(
 				{ email: email },
@@ -407,6 +414,94 @@ const getUserProfile = async (req: any, res: any) => {
 	}
 };
 
+const updateLastLogin = async (req: any, res: any) => {
+	try {
+		const { email, date } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (date === undefined || date === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				lastLogin: date,
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: `Date updated` });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const updateHighScore = async (req: any, res: any) => {
+	try {
+		const { email, score } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (score === undefined || score === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				'gamification.highScore': Number(score),
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: `HighScore updated` });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getHighScore = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+
+		return res.status(200).json({ message: user.gamification.highScore });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getLastLogin = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+
+		return res.status(200).json({ message: user.lastLogin });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
@@ -421,4 +516,8 @@ module.exports = {
 	deleteUser,
 	updateOneJournal,
 	deleteOneJournal,
+	updateLastLogin,
+	updateHighScore,
+	getHighScore,
+	getLastLogin,
 };
