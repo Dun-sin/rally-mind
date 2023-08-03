@@ -115,7 +115,9 @@ const updateLastLoginDate = async () => {
     } else {
       logger(`Couldn't update last login`);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger(error);
+  }
 };
 
 export const checkStreak = async () => {
