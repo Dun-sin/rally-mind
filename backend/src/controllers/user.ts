@@ -14,7 +14,7 @@ const createUser = async (req: any, res: any) => {
 		}
 
 		const { email, password, username, gender } = req.body;
-		logger.info({ email, password, username, gender })
+		logger.info({ email, password, username, gender });
 		const existingUser = await User.findOne({ email });
 		const exisitingUsername = await User.findOne({ username });
 
@@ -37,7 +37,7 @@ const createUser = async (req: any, res: any) => {
 			email,
 			password: passwordHash,
 			username,
-			gender: gender.toLowerCase(),
+			gender: gender,
 		};
 
 		const user = new User(userDetails);
