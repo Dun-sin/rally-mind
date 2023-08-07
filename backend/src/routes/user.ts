@@ -11,7 +11,7 @@ const {
 	getAllJournals,
 	updateStreak,
 	getUsersRank,
-	addPoints,
+	updatePoints,
 	getUserProfile,
 	deleteUser,
 	updateOneJournal,
@@ -21,6 +21,7 @@ const {
 	getHighScore,
 	getLastLogin,
 	updateJournalTime,
+	getJournalTime,
 } = require('../controllers/user');
 const { User } = require('../models/User');
 
@@ -32,7 +33,7 @@ UserRouter.route('/deleteUser').post(protectedRoute, deleteUser);
 // PUT endpoints
 UserRouter.route('/updateMood').put(protectedRoute, updateMood);
 UserRouter.route('/updateStreak').put(protectedRoute, updateStreak);
-UserRouter.route('/addPoints').put(protectedRoute, addPoints);
+UserRouter.route('/updatePoints').put(protectedRoute, updatePoints);
 UserRouter.route('/updateOneJournal').put(protectedRoute, updateOneJournal);
 UserRouter.route('/deleteOneJournal').put(protectedRoute, deleteOneJournal);
 UserRouter.route('/updateJournal').put(protectedRoute, updateJournal);
@@ -42,7 +43,9 @@ UserRouter.route('/updateLastLogin')
 UserRouter.route('/updateHighScore')
 	.put(protectedRoute, updateHighScore)
 	.get(protectedRoute, getHighScore);
-UserRouter.route('/updateJournalTime').put(protectedRoute, updateJournalTime);
+UserRouter.route('/journalTime')
+	.put(protectedRoute, updateJournalTime)
+	.get(protectedRoute, getJournalTime);
 
 // Get endpoints
 UserRouter.route('/journal').get(protectedRoute, getAllJournals);

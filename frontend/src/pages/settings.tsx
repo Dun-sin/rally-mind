@@ -26,6 +26,7 @@ const Settings: React.FC = () => {
 
   useEffect(() => {
     getUserProfile();
+    getJournalTime();
   }, []);
 
   async function getUserProfile() {
@@ -44,8 +45,32 @@ const Settings: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        logger(data.message, 'profile');
         setProfile(data.message);
+      } else {
+        logger(data.message, 'error');
+      }
+    } catch (error) {
+      logger(error, 'error');
+    }
+  }
+
+  async function getJournalTime() {
+    try {
+      const response = await fetch(
+        `https://rally-mind.onrender.com/api/user/journalTime?email=${getFromLocalStorage(
+          'email'
+        )}`,
+        {
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${getFromLocalStorage('token')}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        logger(data.message, 'Journal Time');
       } else {
         logger(data.message, 'error');
       }
@@ -87,7 +112,7 @@ const Settings: React.FC = () => {
 
   const onSubmit = async (journalTime: string) => {
     const response = await fetch(
-      `https://rally-mind.onrender.com/api/user/updateJournalTime`,
+      `https://rally-mind.onrender.com/api/user/journalTime`,
       {
         method: 'PUT',
         headers: {

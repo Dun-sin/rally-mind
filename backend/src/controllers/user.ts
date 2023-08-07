@@ -75,27 +75,6 @@ const loginUser = async (req: any, res: any) => {
 	}
 };
 
-const deleteUser = async (req: any, res: any) => {
-	try {
-		const { email } = req.body;
-
-		console.log(email);
-
-		if (email === undefined || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		}
-
-		await User.findOneAndDelete({ email: email });
-
-		return res.status(200).json({ message: `Account Deleted` });
-	} catch (error) {
-		logger.error(error);
-		return res
-			.status(500)
-			.json({ message: `Internal Server Error: Couldn't delete account` });
-	}
-};
-
 const protectedRoute = (req: any, res: any, next: any) => {
 	const authHeader = req.headers.authorization;
 
@@ -124,6 +103,152 @@ const protectedRoute = (req: any, res: any, next: any) => {
 	}
 };
 
+// Get functions
+const getHighScore = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+
+		return res.status(200).json({ message: user.gamification.highScore });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getLastLogin = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+
+		return res.status(200).json({ message: user.lastLogin });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getAllJournals = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email === undefined || email === null) return;
+
+		const user = await User.findOne({ email });
+
+		logger.info(user.journal);
+		return res.status(200).json({ message: user.journal });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+const getUsersRank = async (req: any, res: any) => {
+	try {
+		const topUsers: {
+			email: string;
+			points: number;
+		}[] = await User.aggregate([
+			{
+				$sort: { 'gamification.points': -1 },
+			},
+			{
+				$limit: 3,
+			},
+			{
+				$project: {
+					_id: 0,
+					name: '$username',
+					points: '$gamification.points',
+				},
+			},
+		]);
+
+		const remainUsers: {
+			email: string;
+			points: number;
+		}[] = await User.aggregate([
+			{
+				$sort: { 'gamification.points': -1 },
+			},
+			{
+				$skip: 3,
+			},
+			{
+				$project: {
+					_id: 0,
+					name: '$username',
+					points: '$gamification.points',
+				},
+			},
+		]);
+
+		return res.status(200).json({
+			message: {
+				top3: topUsers,
+				others: remainUsers,
+			},
+		});
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const getUserProfile = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+		const details = {
+			username: user.username,
+			email: user.email,
+			gender: user.gender,
+			gamification: {
+				points: user.gamification.points,
+				streak: user.gamification.streak,
+			},
+		};
+
+		return res.status(200).json({ message: details });
+	} catch (error) {
+		logger.error(error);
+		return res.staus(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+const getJournalTime = async (req: any, res: any) => {
+	try {
+		const email = req.query.email;
+
+		if (email == undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		const user = await User.findOne({ email });
+		return res.status(200).json({ message: user.journalTime });
+	} catch (error) {
+		logger.error(error);
+		return res.staus(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+// Update functions
 const updateMood = async (req: any, res: any) => {
 	try {
 		const { email, moodDetails } = req.body;
@@ -222,199 +347,6 @@ const updateOneJournal = async (req: any, res: any) => {
 	}
 };
 
-const deleteOneJournal = async (req: any, res: any) => {
-	try {
-		const { email, id } = req.body;
-
-		logger.info(id);
-		if (email === 'undefined' || email === null) {
-			return res.status(400).json({ message: 'No id was provided' });
-		} else if (id === undefined || id === null) {
-			return res.status(400).json({ message: 'No data was provided' });
-		}
-
-		const updateData = {
-			$pull: { journal: { _id: new mongoose.Types.ObjectId(id) } },
-		};
-
-		const options = {
-			new: true,
-		};
-
-		await User.findOneAndUpdate({ email: email }, updateData, options);
-
-		return res.status(200).json({ message: 'Journal Deleted' });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: 'Internal Server Error' });
-	}
-};
-
-const getAllJournals = async (req: any, res: any) => {
-	try {
-		const email = req.query.email;
-
-		if (email === undefined || email === null) return;
-
-		const user = await User.findOne({ email });
-
-		logger.info(user.journal);
-		return res.status(200).json({ message: user.journal });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: 'Internal Server Error' });
-	}
-};
-
-const updateStreak = async (req: any, res: any) => {
-	try {
-		const { email, isStreakOn } = req.body;
-
-		if (email === 'undefined' || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		} else if (isStreakOn === undefined || isStreakOn === null) {
-			return res.status(400).json({ message: 'No data was provided' });
-		}
-
-		if (isStreakOn) {
-			await User.findOneAndUpdate(
-				{ email: email },
-				{
-					$inc: {
-						'gamification.streak': 1,
-					},
-				},
-				{
-					returnOriginal: false,
-				},
-			);
-		} else {
-			await User.findOneAndUpdate(
-				{ email: email },
-				{
-					'gamification.streak': 0,
-				},
-				{
-					returnOriginal: false,
-				},
-			);
-		}
-
-		return res.status(200).json({ message: `Streak Updated` });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: `Internal Server Error` });
-	}
-};
-
-const getUsersRank = async (req: any, res: any) => {
-	try {
-		const topUsers: {
-			email: string;
-			points: number;
-		}[] = await User.aggregate([
-			{
-				$sort: { 'gamification.points': -1 },
-			},
-			{
-				$limit: 3,
-			},
-			{
-				$project: {
-					_id: 0,
-					name: '$username',
-					points: '$gamification.points',
-				},
-			},
-		]);
-
-		const remainUsers: {
-			email: string;
-			points: number;
-		}[] = await User.aggregate([
-			{
-				$sort: { 'gamification.points': -1 },
-			},
-			{
-				$skip: 3,
-			},
-			{
-				$project: {
-					_id: 0,
-					name: '$username',
-					points: '$gamification.points',
-				},
-			},
-		]);
-
-		return res.status(200).json({
-			message: {
-				top3: topUsers,
-				others: remainUsers,
-			},
-		});
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: `Internal Server Error` });
-	}
-};
-
-const addPoints = async (req: any, res: any) => {
-	try {
-		const { email, points } = req.body;
-
-		if (email === 'undefined' || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		} else if (points === undefined || points === null) {
-			return res.status(400).json({ message: 'No data was provided' });
-		}
-
-		await User.findOneAndUpdate(
-			{ email: email },
-			{
-				$inc: {
-					'gamification.points': points,
-				},
-			},
-			{
-				returnOriginal: false,
-			},
-		);
-
-		return res.status(200).json({ message: 'Added Points' });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: 'Internal Server Error' });
-	}
-};
-
-const getUserProfile = async (req: any, res: any) => {
-	try {
-		const email = req.query.email;
-
-		if (email == undefined || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		}
-
-		const user = await User.findOne({ email });
-		const details = {
-			username: user.username,
-			email: user.email,
-			gender: user.gender,
-			gamification: {
-				points: user.gamification.points,
-				streak: user.gamification.streak,
-			},
-		};
-
-		logger.info(details);
-		return res.status(200).json({ message: details });
-	} catch (error) {
-		logger.error(error);
-		return res.staus(500).json({ message: 'Internal Server Error' });
-	}
-};
-
 const updateLastLogin = async (req: any, res: any) => {
 	try {
 		const { email, date } = req.body;
@@ -469,40 +401,6 @@ const updateHighScore = async (req: any, res: any) => {
 	}
 };
 
-const getHighScore = async (req: any, res: any) => {
-	try {
-		const email = req.query.email;
-
-		if (email == undefined || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		}
-
-		const user = await User.findOne({ email });
-
-		return res.status(200).json({ message: user.gamification.highScore });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: `Internal Server Error` });
-	}
-};
-
-const getLastLogin = async (req: any, res: any) => {
-	try {
-		const email = req.query.email;
-
-		if (email == undefined || email === null) {
-			return res.status(400).json({ message: 'No email was provided' });
-		}
-
-		const user = await User.findOne({ email });
-
-		return res.status(200).json({ message: user.lastLogin });
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({ message: `Internal Server Error` });
-	}
-};
-
 const updateJournalTime = async (req: any, res: any) => {
 	try {
 		const { email, journalTime } = res.body;
@@ -530,6 +428,126 @@ const updateJournalTime = async (req: any, res: any) => {
 	}
 };
 
+const updateStreak = async (req: any, res: any) => {
+	try {
+		const { email, isStreakOn } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (isStreakOn === undefined || isStreakOn === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		if (isStreakOn) {
+			await User.findOneAndUpdate(
+				{ email: email },
+				{
+					$inc: {
+						'gamification.streak': 1,
+					},
+				},
+				{
+					returnOriginal: false,
+				},
+			);
+		} else {
+			await User.findOneAndUpdate(
+				{ email: email },
+				{
+					'gamification.streak': 0,
+				},
+				{
+					returnOriginal: false,
+				},
+			);
+		}
+
+		return res.status(200).json({ message: `Streak Updated` });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
+const updatePoints = async (req: any, res: any) => {
+	try {
+		const { email, points } = req.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (points === undefined || points === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		await User.findOneAndUpdate(
+			{ email: email },
+			{
+				$inc: {
+					'gamification.points': points,
+				},
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200).json({ message: 'Added Points' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
+// Delete functions
+const deleteUser = async (req: any, res: any) => {
+	try {
+		const { email } = req.body;
+
+		console.log(email);
+
+		if (email === undefined || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		}
+
+		await User.findOneAndDelete({ email: email });
+
+		return res.status(200).json({ message: `Account Deleted` });
+	} catch (error) {
+		logger.error(error);
+		return res
+			.status(500)
+			.json({ message: `Internal Server Error: Couldn't delete account` });
+	}
+};
+
+const deleteOneJournal = async (req: any, res: any) => {
+	try {
+		const { email, id } = req.body;
+
+		logger.info(id);
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No id was provided' });
+		} else if (id === undefined || id === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		const updateData = {
+			$pull: { journal: { _id: new mongoose.Types.ObjectId(id) } },
+		};
+
+		const options = {
+			new: true,
+		};
+
+		await User.findOneAndUpdate({ email: email }, updateData, options);
+
+		return res.status(200).json({ message: 'Journal Deleted' });
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: 'Internal Server Error' });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
@@ -539,7 +557,7 @@ module.exports = {
 	getAllJournals,
 	updateStreak,
 	getUsersRank,
-	addPoints,
+	updatePoints,
 	getUserProfile,
 	deleteUser,
 	updateOneJournal,
@@ -549,4 +567,5 @@ module.exports = {
 	getHighScore,
 	getLastLogin,
 	updateJournalTime,
+	getJournalTime,
 };

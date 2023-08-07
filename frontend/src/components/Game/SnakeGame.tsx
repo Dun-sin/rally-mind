@@ -126,7 +126,7 @@ export default function SnakeGame() {
     if (score === 0) return;
     try {
       const response = await fetch(
-        'https://rally-mind.onrender.com/api/user/addPoints',
+        'https://rally-mind.onrender.com/api/user/updatePoints',
         {
           method: 'PUT',
           headers: {
