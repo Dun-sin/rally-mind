@@ -20,6 +20,7 @@ const {
 	updateHighScore,
 	getHighScore,
 	getLastLogin,
+	updateJournalTime,
 } = require('../controllers/user');
 const { User } = require('../models/User');
 
@@ -41,6 +42,7 @@ UserRouter.route('/updateLastLogin')
 UserRouter.route('/updateHighScore')
 	.put(protectedRoute, updateHighScore)
 	.get(protectedRoute, getHighScore);
+UserRouter.route('/updateJournalTime').put(protectedRoute, updateJournalTime);
 
 // Get endpoints
 UserRouter.route('/journal').get(protectedRoute, getAllJournals);

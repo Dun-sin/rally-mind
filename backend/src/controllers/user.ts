@@ -453,7 +453,7 @@ const updateHighScore = async (req: any, res: any) => {
 		}
 
 		await User.findOneAndUpdate(
-			{ email: email },
+			{ email },
 			{
 				'gamification.highScore': Number(score),
 			},
@@ -503,6 +503,33 @@ const getLastLogin = async (req: any, res: any) => {
 	}
 };
 
+const updateJournalTime = async (req: any, res: any) => {
+	try {
+		const { email, journalTime } = res.body;
+
+		if (email === 'undefined' || email === null) {
+			return res.status(400).json({ message: 'No email was provided' });
+		} else if (journalTime === undefined || journalTime === null) {
+			return res.status(400).json({ message: 'No data was provided' });
+		}
+
+		await User.findOneAndUpdate(
+			{ email },
+			{
+				journalTime,
+			},
+			{
+				returnOriginal: false,
+			},
+		);
+
+		return res.status(200);
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({ message: `Internal Server Error` });
+	}
+};
+
 module.exports = {
 	createUser,
 	loginUser,
@@ -521,4 +548,5 @@ module.exports = {
 	updateHighScore,
 	getHighScore,
 	getLastLogin,
+	updateJournalTime,
 };

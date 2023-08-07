@@ -175,7 +175,7 @@ const Home: React.FC = () => {
                 </div>
               )}
             </section>
-            <section className='flex h-1/3 flex-col gap-3 opacity-95'>
+            {/* <section className='flex h-1/3 flex-col gap-3 opacity-95'>
               <span>
                 <h2>Songs</h2>
                 <p>Listen to songs right for your mood</p>
@@ -200,7 +200,7 @@ const Home: React.FC = () => {
                   );
                 })}
               </div>
-            </section>
+            </section> */}
           </main>
         </section>
       </Layout>

@@ -42,7 +42,27 @@ const Login = () => {
 
       checkToken();
     }
-  });
+  }, []);
+
+  useEffect(() => {
+    const handleRouteChange = (
+      url: string,
+      { shallow }: { shallow: boolean }
+    ) => {
+      // Check if you want to prevent the route change under certain conditions
+      if (loading) {
+        // Prevent the route change
+        router.events.emit('routeChangeError');
+        throw new Error('Route change is not allowed');
+      }
+    };
+
+    router.events.on('beforeHistoryChange', handleRouteChange);
+
+    return () => {
+      router.events.off('beforeHistoryChange', handleRouteChange);
+    };
+  }, []);
 
   const handleLogin = async (loginDetails: loginDetailsType) => {
     try {

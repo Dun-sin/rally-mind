@@ -13,6 +13,7 @@ export interface IUser extends Document {
 	}[];
 	password: string;
 	lastLogin: Date;
+	journalTime: string;
 	gamification: {
 		points: number;
 		streak: number;
@@ -50,6 +51,7 @@ const UserSchema: Schema = new Schema<IUserDocument, IUserModel>({
 	],
 	lastLogin: { type: Date },
 	password: { type: String, required: true },
+	journalTime: { type: String },
 	gamification: {
 		points: { type: Number, required: true, default: 0 },
 		streak: { type: Number, required: true, default: 0 },

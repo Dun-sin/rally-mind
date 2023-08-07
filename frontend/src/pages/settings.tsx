@@ -6,6 +6,7 @@ import logger from '@/lib/logger';
 import { profile } from '@/types/User';
 import Layout from '@/components/Layout';
 import Protected from '@/components/Protected';
+import TimeSelect from '@/components/TimeSelect';
 import { getFromLocalStorage } from '@/lib/helper';
 
 import { Icon } from '@iconify/react';
@@ -84,6 +85,26 @@ const Settings: React.FC = () => {
     }
   };
 
+  const onSubmit = async (journalTime: string) => {
+    const response = await fetch(
+      `https://rally-mind.onrender.com/api/user/updateJournalTime`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${getFromLocalStorage('token')}`,
+        },
+        body: JSON.stringify({ journalTime }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      logger(data.message);
+    }
+  };
+
   return (
     <Protected>
       <Layout>
@@ -143,12 +164,12 @@ const Settings: React.FC = () => {
               </span>
             </section>
 
-            <section className='text-primary w-full gap-3'>
+            <section className='w-full gap-3'>
               <div className='bg-brand flex w-full items-center justify-between rounded-lg px-4 py-4'>
-                <p className='text-base'>Remind me to Journal Everyday at</p>
-                <div className='border-primary rounded-md border p-2'>
-                  10:00AM
-                </div>
+                <p className='text-primary text-base'>
+                  Remind me to Journal Everyday at
+                </p>
+                <TimeSelect onSubmit={onSubmit} />
               </div>
             </section>
           </main>
