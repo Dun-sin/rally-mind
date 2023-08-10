@@ -44,14 +44,14 @@ const Rank: React.FC = () => {
   return (
     <Layout>
       <section className='h-full w-full flex-col'>
-        <header className='bg-brand flex h-[8%] w-full items-center justify-between rounded-b-2xl px-4 py-3'>
+        <header className='bg-brand flex h-[10%] w-full items-center rounded-b-2xl px-4 py-3'>
           <h2 className='text-primary text-3xl'>LeaderBoard</h2>
-          <Icon
+          {/* <Icon
             icon='mingcute:information-fill'
             className='text-primary h-8 w-8 cursor-pointer'
-          />
+          /> */}
         </header>
-        <main className='h-[92%] w-full px-4 py-6 text-xl'>
+        <main className='h-[90%] w-full px-4 py-6 text-xl'>
           <div className='flex items-center justify-between'>
             <div className='bg-brand h-1 w-[40%]' />
             <span>Top 3👇🏾</span>

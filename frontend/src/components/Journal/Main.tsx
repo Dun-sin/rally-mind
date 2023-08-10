@@ -60,9 +60,9 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
           clipPath: 'polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%)',
         }}
       >
-        <div className='flex justify-between'>
+        <div className=''>
           <h1 className='text-3xl'>Journal</h1>
-          <Icon icon='ion:filter' className='h-8 w-8' />
+          {/* <Icon icon='ion:filter' className='h-8 w-8' /> */}
         </div>
         <div className='flex flex-col items-center'>
           <h2 className='text-center text-2xl'>Record your daily life</h2>
@@ -80,9 +80,9 @@ const Main = ({ setJournalInfo, setState }: mainProps) => {
       />
 
       <main className='relative z-10 mb-14 flex h-[60%] w-full flex-col gap-2 px-6'>
-        <span className='ml-auto font-medium underline underline-offset-1'>
+        {/* <span className='ml-auto font-medium underline underline-offset-1'>
           Viewing all Journals
-        </span>
+        </span> */}
         <div
           className={`text-primary flex h-full w-full flex-col gap-3 overflow-y-auto ${
             loading && 'items-center'

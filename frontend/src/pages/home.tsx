@@ -121,9 +121,13 @@ const Home: React.FC = () => {
               />
             </Link>
           </header>
-          <main className='flex h-full flex-col gap-12'>
-            <section className='flex h-2/5 flex-col gap-3'>
-              <h2>How are you feeling today?</h2>
+          <main className='flex h-full flex-col'>
+            <section className='mt-20 flex h-2/5 flex-col gap-3'>
+              <h2>
+                {showReason
+                  ? `Why are you ${mood.toLowerCase()}?`
+                  : 'How are you feeling today?'}
+              </h2>
               {!showReason ? (
                 <div className='bg-brand max:h-full max:w-full flex h-full w-full flex-wrap content-start gap-3 rounded-md px-3 py-5'>
                   {moods.map(({ icon, name, color }) => {
@@ -145,12 +149,11 @@ const Home: React.FC = () => {
                 </div>
               ) : (
                 <div className='bg-brand max:h-full max:w-full relative flex h-full w-full flex-col items-center rounded-md px-3 py-5'>
-                  <span className='relative flex h-2/4 w-full flex-col'>
+                  <span className='relative flex h-full w-full flex-col'>
                     <textarea
                       name='reason'
                       id='reason'
                       className='ring-brand focus:ring-brand h-full w-full resize-none rounded-lg border-0 ring ring-inset focus:ring focus:ring-inset'
-                      placeholder={`Why are you feeling ${mood}?`}
                       ref={textareaRef}
                       onChange={handleChange}
                     />
@@ -166,8 +169,12 @@ const Home: React.FC = () => {
                       {remainingcharacters}
                     </span>
                   </span>
+                </div>
+              )}
+              {showReason && (
+                <div className='flex w-full items-center justify-center'>
                   <button
-                    className='text-brand bg-primary h-14 w-2/4 rounded-md font-semibold'
+                    className='bg-brand text-primary h-14 w-2/4 rounded-md font-semibold'
                     onClick={handleSubmit}
                   >
                     Submit
